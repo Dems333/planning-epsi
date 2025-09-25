@@ -1,0 +1,33 @@
+name: Generate ICS
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # Tous les jours à 05h00 UTC
+  workflow_dispatch: # Permet de lancer manuellement aussi
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run script
+        run: python generate_ics.py
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/planning.ics
+          git commit -m "Update ICS file"
+          git push
